@@ -1,95 +1,74 @@
-import Image from 'next/image'
-import styles from './page.module.css'
+"use client";
+
+import { useState } from "react";
+import { FiSearch } from "react-icons/fi";
+import styles from "../scss/styles.module.scss";
+import api from "@/services/api";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+interface ICep {
+  cep: string;
+  logradouro: string;
+  complemento: string;
+  bairro: string;
+  localidade: string;
+  uf: string;
+  ibge: string;
+  gia: string;
+  ddd: string;
+  siafi: string;
+}
 
 export default function Home() {
+  const [input, setInput] = useState<string>("");
+  const [cep, setCep] = useState<ICep | null>(null);
+
+  async function handleSearch() {
+    if (input === "") {
+      toast.error("Preencha o campo CEP");
+      return;
+    }
+
+    try {
+      const response = await api.get(`${input}/json`);
+      setCep(response.data);
+      setInput("");
+    } catch (error) {
+      toast.error("CEP invalido");
+      setInput("");
+    }
+  }
+
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
+    <div className={styles.container}>
+      <h1 className={styles.title}>Buscador CEP</h1>
 
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
+      <div className={styles.containerInput}>
+        <input
+          onChange={(e) => setInput(e.target.value)}
+          value={input}
+          type="text"
+          placeholder="Digite seu cep..."
         />
+
+        <button className={styles.buttonSearch} onClick={handleSearch}>
+          <FiSearch size={25} color="#FFF" />
+        </button>
       </div>
 
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
+      {cep !== null && Object.keys(cep).length > 0 && (
+        <main className={styles.main}>
+          <h2>CEP: {cep?.cep}</h2>
 
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore the Next.js 13 playground.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  )
+          <span>{cep?.logradouro}</span>
+          <span>{cep?.bairro}</span>
+          <span>
+            {cep?.localidade} - {cep?.uf}
+          </span>
+        </main>
+      )}
+      <ToastContainer />
+    </div>
+  );
 }
