@@ -7,4 +7,4 @@ Logo em seguida, voce pode executar o projeto com o comando: `npm run dev`, e pr
 
 # Acessando o deploy do projeto
 
-Para acessar o deploy do projeto, basta clicar no seguinte link: [buscando-por-cep.vercel.app](https://buscando-por-cep.vercel.app/)https://buscando-por-cep.vercel.app/
+Para acessar o deploy do projeto, basta clicar no seguinte link: https://buscando-por-cep.vercel.app/
